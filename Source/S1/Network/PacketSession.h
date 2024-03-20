@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+#include "S1.h"
 
 /**
  * 
@@ -15,9 +15,20 @@ public:
 	~PacketSession();
 
 	void Run();
-	void Recv();
+
+	void SendPacket(SendBufferRef SendBuffer);
+
+	UFUNCTION(BlueprintCallable)
+	void HandleRecvPackets();
+
 	void Disconnect();
 
 public:
 	class FSocket* Socket;
+
+	TSharedPtr<class RecvWorker> RecvWorkerThread;
+	TSharedPtr<class SendWorker> SendWorkerThread;
+
+	TQueue<TArray<uint8>> RecvPacketQueue;
+	TQueue<SendBufferRef> SendPacketQueue;
 };

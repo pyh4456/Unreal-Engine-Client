@@ -6,6 +6,7 @@
 #include "Common/TcpSocketBuilder.h"
 #include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
+#include "PacketSession.h"
 
 void US1GameInstance::ConnectToGameServer()
 {
@@ -27,7 +28,8 @@ void US1GameInstance::ConnectToGameServer()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Success")));
 	
 		// Session
-
+		GameServerSession = MakeShared<PacketSession>(Socket);
+		GameServerSession->Run();
 	}
 	else
 	{
@@ -43,4 +45,20 @@ void US1GameInstance::DisconnectFromGameServer()
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
 	}
+}
+
+void US1GameInstance::HandleRecvPackets()
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	GameServerSession->HandleRecvPackets();
+}
+
+void US1GameInstance::SendPacket(SendBufferRef SendBuffer)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	GameServerSession->SendPacket(SendBuffer);
 }
