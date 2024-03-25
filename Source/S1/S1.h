@@ -34,3 +34,13 @@ private:
 USING_SHARED_PTR(Session);
 USING_SHARED_PTR(PacketSession);
 USING_SHARED_PTR(SendBuffer);
+
+
+#define SEND_PACKET(pkt)														\
+	SendBufferRef sendBuffer = ClientPacketHandler::MakeSendBuffer(pkt);		\
+	Cast<US1GameInstance>(GWorld->GetGameInstance())->SendPacket(sendBuffer);	\
+
+#include "ClientPacketHandler.h"
+#include "S1GameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
