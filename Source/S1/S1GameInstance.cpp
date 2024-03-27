@@ -70,3 +70,37 @@ void US1GameInstance::SendPacket(SendBufferRef SendBuffer)
 
 	GameServerSession->SendPacket(SendBuffer);
 }
+
+void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	//중복 체크
+	const uint64 ObjectId = PlayerInfo.object_id();
+	if (Players.Find(ObjectId) != nullptr)
+		return;
+
+	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
+	AActor* Actor = World->SpawnActor(PlayerClass, &SpawnLocation);
+
+	Players.Add(PlayerInfo.object_id(), Actor);
+
+}
+
+void US1GameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
+{
+	HandleSpawn(EnterGamePkt.player());
+}
+
+void US1GameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
+{
+	for (auto& Player : SpawnPkt.players())
+	{
+		HandleSpawn(Player);
+	}
+}
