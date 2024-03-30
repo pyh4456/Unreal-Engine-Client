@@ -28,7 +28,7 @@ public:
 	void SendPacket(SendBufferRef SendBuffer);
 
 public:
-	void HandleSpawn(const Protocol::PlayerInfo& PlayerInfo);
+	void HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool IsMine);
 	void HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt);
 	void HandleSpawn(const Protocol::S_SPAWN& SpawnPkt);
 
@@ -45,8 +45,8 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> PlayerClass;
-
+	//TSubclassOf<ACharacter>  OtherPlayerClass;
+	ACharacter* MyPlayer;
 	TMap<uint64, AActor*> Players;
 
 };

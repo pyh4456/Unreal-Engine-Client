@@ -78,7 +78,7 @@ void US1GameInstance::SendPacket(SendBufferRef SendBuffer)
 	GameServerSession->SendPacket(SendBuffer);
 }
 
-void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo)
+void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool IsMine)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -93,22 +93,71 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo)
 		return;
 
 	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
-	AActor* Actor = World->SpawnActor(PlayerClass, &SpawnLocation);
+	 
+	//if (IsMine)
+	//{
+	//	auto* Character = UGameplayStatics::GetPlayerCharacter(World, 0);
 
-	Players.Add(PlayerInfo.object_id(), Actor);
+	//	MyPlayer = Character;
+	//	//Players.Add(PlayerInfo.object_id(), MyPlayer);
+	//}
+	//else
+	//{
+	//	UObject* SpawnActor = BP_Character;
+	//	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	//	if (!SpawnActor)
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+	//		return;
+	//	}
 
+	//	AActor* Player = World->SpawnActor(GeneratedBP->GeneratedClass, &SpawnLocation);
+
+	//	Players.Add(PlayerInfo.object_id(), Player);
+	//}
+	/*UObject* SpawnActor = BP_Character;
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!SpawnActor)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return;
+	}*/
+
+	/*UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return;
+	}*/
+
+	/*if (IsMine)
+	{
+		auto* PC = UGameplayStatics::GetPlayerController(this, 0);
+		SpawnActor = BP_Character(PC->GetPawn());
+		if (SpawnActor == nullptr)
+			return;
+
+		MyPlayer = Cast<AActor>(SpawnActor);
+		Players.Add(PlayerInfo.object_id(), MyPlayer);
+	}
+	else
+	{
+		AActor* Player = World->SpawnActor(GeneratedBP->GeneratedClass, &SpawnLocation);
+
+		Players.Add(PlayerInfo.object_id(), Player);
+	}*/
 }
 
 void US1GameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 {
-	HandleSpawn(EnterGamePkt.player());
+	HandleSpawn(EnterGamePkt.player(), true);
 }
 
 void US1GameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 {
 	for (auto& Player : SpawnPkt.players())
 	{
-		HandleSpawn(Player);
+		HandleSpawn(Player, false);
 	}
 }
 
@@ -123,11 +172,11 @@ void US1GameInstance::HandleDespawn(uint64 ObjectId)
 
 	// TODO : Despawn
 
-	AActor** FindActor = Players.Find(ObjectId);
-	if (FindActor == nullptr)
-		return;
+	//AActor** FindActor = Players.Find(ObjectId);
+	//if (FindActor == nullptr)
+	//	return;
 
-	World->DestroyActor(*FindActor);
+	//World->DestroyActor(*FindActor);
 }
 
 void US1GameInstance::HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt)

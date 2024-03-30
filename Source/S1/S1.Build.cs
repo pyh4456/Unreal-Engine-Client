@@ -16,6 +16,7 @@ public class S1 : ModuleRules
 			{
 				"S1/",
 				"S1/Network/",
+				"S1/Game/",
 			});
 
 		// Uncomment if you are using Slate UI

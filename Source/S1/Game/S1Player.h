@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "MyCharacter.generated.h"
+#include "S1Player.generated.h"
 
 UCLASS()
-class S1_API AMyCharacter : public ACharacter
+class S1_API AS1Player : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AMyCharacter();
+	AS1Player();
 
 protected:
 	// Called when the game starts or when spawned

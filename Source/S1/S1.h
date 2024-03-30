@@ -44,3 +44,8 @@ USING_SHARED_PTR(SendBuffer);
 #include "S1GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+
+//#define BP_Character Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Characters/501/BP_character.BP_character")));
+//#define BP_Sanya Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Characters/501/Sanya_V_Litvyak/BP_sanya.BP_sanya")));
+//#define BP_Yoshika Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Characters/501/Miyafuji_Yoshika/BP_yoshika.BP_yoshika")));
+//#define BP_Lynette Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Characters/501/Lynette_Bishop/BP_lynette.BP_lynette")));
