@@ -2,6 +2,7 @@
 
 
 #include "S1MyPlayer.h"
+#include "S1.h"
 
 // Sets default values
 AS1MyPlayer::AS1MyPlayer()
@@ -23,6 +24,22 @@ void AS1MyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	MovePacketSendTimer -= DeltaTime;
+
+	if (MovePacketSendTimer <= 0)
+	{
+		MovePacketSendTimer = MOVE_PACKET_SEND_DELAY;
+
+		Protocol::C_MOVE MovePkt;
+
+		//현재 위치 정보
+		{
+			Protocol::PlayerInfo* Info = MovePkt.mutable_info();
+			Info->CopyFrom(*PlayerInfo);
+		}
+
+		SEND_PACKET(MovePkt);
+	}
 }
 
 // Called to bind functionality to input

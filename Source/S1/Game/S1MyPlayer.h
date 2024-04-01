@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Game/S1Player.h"
 #include "S1MyPlayer.generated.h"
 
 UCLASS()
-class S1_API AS1MyPlayer : public ACharacter
+class S1_API AS1MyPlayer : public AS1Player
 {
 	GENERATED_BODY()
 
@@ -25,5 +25,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
+	const float MOVE_PACKET_SEND_DELAY = 0.2f;
+	float MovePacketSendTimer = MOVE_PACKET_SEND_DELAY;
 
 };

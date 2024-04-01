@@ -8,6 +8,7 @@
 #include "SocketSubsystem.h"
 #include "PacketSession.h"
 #include "ClientPacketHandler.h"
+#include "S1MyPlayer.h"
 
 void US1GameInstance::ConnectToGameServer()
 {
@@ -93,7 +94,29 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 		return;
 
 	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
-	 
+	
+	if (IsMine)
+	{
+		auto* PC = UGameplayStatics::GetPlayerController(this, 0);
+		AS1Player* Player = Cast<AS1Player>(PC->GetPawn());
+		if (Player == nullptr)
+			return;
+
+		Player->SetPlayerInfo(PlayerInfo);
+
+		MyPlayer = Player;
+		Players.Add(PlayerInfo.object_id(), Player);
+	}
+	else
+	{
+		AS1Player* Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerClass, &SpawnLocation));
+		
+		Player->SetPlayerInfo(PlayerInfo);
+
+		Players.Add(PlayerInfo.object_id(), Player);
+	}
+
+	
 	//if (IsMine)
 	//{
 	//	auto* Character = UGameplayStatics::GetPlayerCharacter(World, 0);
@@ -170,17 +193,37 @@ void US1GameInstance::HandleDespawn(uint64 ObjectId)
 	if (World == nullptr)
 		return;
 
-	// TODO : Despawn
+	AS1Player** FindActor = Players.Find(ObjectId);
+	if (FindActor == nullptr)
+		return;
 
-	//AActor** FindActor = Players.Find(ObjectId);
-	//if (FindActor == nullptr)
-	//	return;
-
-	//World->DestroyActor(*FindActor);
+	World->DestroyActor(*FindActor);
 }
 
 void US1GameInstance::HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt)
 {
 	for (auto& ObjectId : DespawnPkt.object_ids())
 		HandleDespawn(ObjectId);
+}
+
+void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	const uint64 ObjectId = MovePkt.info().object_id();
+	AS1Player** FindActor = Players.Find(ObjectId);
+	if (FindActor == nullptr)
+		return;
+
+	AS1Player* Player = (*FindActor);
+	if (Player->IsMyPlayer())
+		return;
+
+	const Protocol::PlayerInfo& Info = MovePkt.info();
+	Player->SetPlayerInfo(Info);
 }

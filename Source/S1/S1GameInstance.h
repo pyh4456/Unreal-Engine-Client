@@ -7,6 +7,8 @@
 #include "Engine/GameInstance.h"
 #include "S1GameInstance.generated.h"
 
+class AS1Player;
+
 /**
  * 
  */
@@ -35,6 +37,8 @@ public:
 	void HandleDespawn(uint64 ObjectId);
 	void HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt);
 
+	void HandleMove(const Protocol::S_MOVE& MovePkt);
+
 
 public:
 	// GameServer
@@ -45,8 +49,9 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	//TSubclassOf<ACharacter>  OtherPlayerClass;
-	ACharacter* MyPlayer;
-	TMap<uint64, AActor*> Players;
+	TSubclassOf<AS1Player>  OtherPlayerClass;
+
+	AS1Player* MyPlayer;
+	TMap<uint64, AS1Player*> Players;
 
 };
