@@ -95,12 +95,39 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 
 	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
 	
+
 	if (IsMine)
 	{
-		auto* PC = UGameplayStatics::GetPlayerController(this, 0);
-		AS1Player* Player = Cast<AS1Player>(PC->GetPawn());
-		if (Player == nullptr)
-			return;
+		AS1Player* Player = nullptr;
+
+		switch (PlayerInfo.type())
+		{
+		case Protocol::PLAYER_TYPE_YOSHIKA:
+			Player = Cast<AS1Player>(World->SpawnActor(MyPlayerYoshika, &SpawnLocation));
+			break;
+		case Protocol::PLAYER_TYPE_LYNETTE:
+			Player = Cast<AS1Player>(World->SpawnActor(MyPlayerLynette, &SpawnLocation));
+			break;
+		case Protocol::PLAYER_TYPE_SANYA:
+			Player = Cast<AS1Player>(World->SpawnActor(MyPlayerSanya, &SpawnLocation));
+			break;
+		default:
+			Player = Cast<AS1Player>(World->SpawnActor(MyPlayerClass, &SpawnLocation));
+			break;
+		}
+
+		APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
+		controller->UnPossess();
+		controller->Possess(Player);
+
+		//auto* PC = UGameplayStatics::GetPlayerController(this, 0);
+		//Player->PossessedBy(PC);
+
+		//auto* PC = UGameplayStatics::GetPlayerController(this, 0);
+		//AS1Player* Player = Cast<AS1Player>(PC->GetPawn());
+		//if (Player == nullptr)
+		//	return;
+
 
 		Player->SetPlayerInfo(PlayerInfo);
 
@@ -109,8 +136,27 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 	}
 	else
 	{
-		AS1Player* Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerClass, &SpawnLocation));
-		
+		AS1Player* Player = nullptr;
+
+		switch (PlayerInfo.type())
+		{
+		case Protocol::PLAYER_TYPE_YOSHIKA:
+			Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerYoshika, &SpawnLocation));
+			break;
+		case Protocol::PLAYER_TYPE_LYNETTE:
+			Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerLynette, &SpawnLocation));
+			break;
+		case Protocol::PLAYER_TYPE_SANYA:
+			Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerSanya, &SpawnLocation));
+			break;
+		default:
+			Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerClass, &SpawnLocation));
+			break;
+		}
+
+		if (Player == nullptr)
+			return;
+
 		Player->SetPlayerInfo(PlayerInfo);
 
 		Players.Add(PlayerInfo.object_id(), Player);

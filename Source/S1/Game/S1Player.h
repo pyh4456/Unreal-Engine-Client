@@ -22,10 +22,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	int GetCharacterType();
+
 public:
 	bool IsMyPlayer();
 	void SetPlayerInfo(const Protocol::PlayerInfo& Info);
 	Protocol::PlayerInfo* GetPlayerInfo() { return PlayerInfo; }
+	
+	
 
 public:	
 	// Called every frame
@@ -36,5 +41,4 @@ public:
 
 protected:
 	class Protocol::PlayerInfo* PlayerInfo; //현재 위치
-
 };

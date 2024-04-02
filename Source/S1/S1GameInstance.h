@@ -50,8 +50,25 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AS1Player>  OtherPlayerClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  OtherPlayerYoshika;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  OtherPlayerLynette;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  OtherPlayerSanya;
+
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  MyPlayerClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  MyPlayerYoshika;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  MyPlayerLynette;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Player>  MyPlayerSanya;
 
 	AS1Player* MyPlayer;
 	TMap<uint64, AS1Player*> Players;
 
+	
 };

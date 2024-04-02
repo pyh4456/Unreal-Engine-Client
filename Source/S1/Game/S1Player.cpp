@@ -45,6 +45,24 @@ void AS1Player::SetPlayerInfo(const Protocol::PlayerInfo& Info)
 	SetActorLocationAndRotation(Location, Rotation);
 }
 
+int AS1Player::GetCharacterType()
+{
+	switch (PlayerInfo->type())
+	{
+	case Protocol::PLAYER_TYPE_YOSHIKA:
+		return 1;
+		break;
+	case Protocol::PLAYER_TYPE_LYNETTE:
+		return 2;
+		break;
+	case Protocol::PLAYER_TYPE_SANYA:
+		return 3;
+		break;
+	}
+
+	return 0;
+}
+
 // Called every frame
 void AS1Player::Tick(float DeltaTime)
 {

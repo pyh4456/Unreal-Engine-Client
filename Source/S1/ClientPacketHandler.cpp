@@ -11,6 +11,9 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 
 bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 {
+	//srand((unsigned int)time(NULL));
+	int character = (rand() % 3) + 1;
+
 	for (auto& Plyaer : pkt.players())
 	{
 
@@ -19,7 +22,7 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	// 로비에서 캐릭터 선택해서 인덱스 전송.
 
 	Protocol::C_ENTER_GAME EnterGamePkt;
-	EnterGamePkt.set_playerindex(0);
+	EnterGamePkt.set_playerindex(character);
 	SEND_PACKET(EnterGamePkt);
 
 	return true;
