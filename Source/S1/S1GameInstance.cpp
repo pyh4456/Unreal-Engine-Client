@@ -125,9 +125,9 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 
 		//auto* PC = UGameplayStatics::GetPlayerController(this, 0);
 		//AS1Player* Player = Cast<AS1Player>(PC->GetPawn());
-		//if (Player == nullptr)
-		//	return;
-
+		
+		if (Player == nullptr)
+			return;
 
 		Player->SetPlayerInfo(PlayerInfo);
 
@@ -271,5 +271,7 @@ void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 		return;
 
 	const Protocol::PlayerInfo& Info = MovePkt.info();
-	Player->SetPlayerInfo(Info);
+	//Player->SetPlayerInfo(Info); //바로 이동
+
+	Player->SetDestInfo(Info); //이동 목적지를 설정
 }

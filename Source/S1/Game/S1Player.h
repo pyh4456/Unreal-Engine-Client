@@ -27,10 +27,12 @@ protected:
 
 public:
 	bool IsMyPlayer();
+	Protocol::MoveState GetMoveState() { return PlayerInfo->state(); }
+	void SetMoveState(Protocol::MoveState State);
+
 	void SetPlayerInfo(const Protocol::PlayerInfo& Info);
+	void SetDestInfo(const Protocol::PlayerInfo& Info);
 	Protocol::PlayerInfo* GetPlayerInfo() { return PlayerInfo; }
-	
-	
 
 public:	
 	// Called every frame
@@ -40,5 +42,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	class Protocol::PlayerInfo* PlayerInfo; //현재 위치
+	class Protocol::PlayerInfo* PlayerInfo; // 현재 위치
+	class Protocol::PlayerInfo* DestInfo; // 목적지
 };
