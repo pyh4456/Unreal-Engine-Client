@@ -1,6 +1,8 @@
+!Source/
+
 # Visual Studio 2015 user specific files
 .vs/
-!Source/
+
 
 # Compiled Object files
 *.slo
