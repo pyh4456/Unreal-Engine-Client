@@ -34,8 +34,8 @@ void AS1MyPlayer::Tick(float DeltaTime)
 
 		//현재 위치 정보
 		{
-			Protocol::PlayerInfo* Info = MovePkt.mutable_info();
-			Info->CopyFrom(*PlayerInfo);
+			Protocol::PosInfo* Info = MovePkt.mutable_info();
+			Info->CopyFrom(*PosInfo);
 		}
 
 		SEND_PACKET(MovePkt);

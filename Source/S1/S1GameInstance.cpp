@@ -79,7 +79,7 @@ void US1GameInstance::SendPacket(SendBufferRef SendBuffer)
 	GameServerSession->SendPacket(SendBuffer);
 }
 
-void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool IsMine)
+void US1GameInstance::HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool IsMine)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -89,18 +89,17 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 		return;
 
 	//중복 체크
-	const uint64 ObjectId = PlayerInfo.object_id();
+	const uint64 ObjectId = ObjectInfo.object_id();
 	if (Players.Find(ObjectId) != nullptr)
 		return;
 
-	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
-	
+	FVector SpawnLocation(ObjectInfo.pos_info().x(), ObjectInfo.pos_info().y(), ObjectInfo.pos_info().z());
 
 	if (IsMine)
 	{
 		AS1Player* Player = nullptr;
 
-		switch (PlayerInfo.type())
+		switch (ObjectInfo.player_type())
 		{
 		case Protocol::PLAYER_TYPE_YOSHIKA:
 			Player = Cast<AS1Player>(World->SpawnActor(MyPlayerYoshika, &SpawnLocation));
@@ -119,26 +118,22 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 		APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
 		controller->UnPossess();
 		controller->Possess(Player);
-
-		//auto* PC = UGameplayStatics::GetPlayerController(this, 0);
-		//Player->PossessedBy(PC);
-
-		//auto* PC = UGameplayStatics::GetPlayerController(this, 0);
-		//AS1Player* Player = Cast<AS1Player>(PC->GetPawn());
 		
 		if (Player == nullptr)
 			return;
 
-		Player->SetPlayerInfo(PlayerInfo);
+		Player->SetPlayerInfo(ObjectInfo);
+		Player->SetPosInfo(ObjectInfo.pos_info());
+		Player->SetIsMyPlayer(true);
 
 		MyPlayer = Player;
-		Players.Add(PlayerInfo.object_id(), Player);
+		Players.Add(ObjectInfo.object_id(), Player);
 	}
 	else
 	{
 		AS1Player* Player = nullptr;
 
-		switch (PlayerInfo.type())
+		switch (ObjectInfo.player_type())
 		{
 		case Protocol::PLAYER_TYPE_YOSHIKA:
 			Player = Cast<AS1Player>(World->SpawnActor(OtherPlayerYoshika, &SpawnLocation));
@@ -157,9 +152,11 @@ void US1GameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool I
 		if (Player == nullptr)
 			return;
 
-		Player->SetPlayerInfo(PlayerInfo);
+		Player->SetPlayerInfo(ObjectInfo);
+		Player->SetPosInfo(ObjectInfo.pos_info());
+		Player->SetIsMyPlayer(false);
 
-		Players.Add(PlayerInfo.object_id(), Player);
+		Players.Add(ObjectInfo.object_id(), Player);
 	}
 
 	
@@ -270,7 +267,7 @@ void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 	if (Player->IsMyPlayer())
 		return;
 
-	const Protocol::PlayerInfo& Info = MovePkt.info();
+	const Protocol::PosInfo& Info = MovePkt.info();
 	//Player->SetPlayerInfo(Info); //바로 이동
 
 	Player->SetDestInfo(Info); //이동 목적지를 설정

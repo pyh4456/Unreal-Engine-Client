@@ -26,13 +26,15 @@ protected:
 	int GetCharacterType();
 
 public:
-	bool IsMyPlayer();
-	Protocol::MoveState GetMoveState() { return PlayerInfo->state(); }
+	bool IsMyPlayer() { return IsMine; }
+	void SetIsMyPlayer(bool isMyPlayer) { IsMine = isMyPlayer; }
+	Protocol::MoveState GetMoveState() { return PosInfo->state(); }
 	void SetMoveState(Protocol::MoveState State);
 
-	void SetPlayerInfo(const Protocol::PlayerInfo& Info);
-	void SetDestInfo(const Protocol::PlayerInfo& Info);
-	Protocol::PlayerInfo* GetPlayerInfo() { return PlayerInfo; }
+	void SetPlayerInfo(const Protocol::ObjectInfo& Info);
+	void SetPosInfo(const Protocol::PosInfo& Info);
+	void SetDestInfo(const Protocol::PosInfo& Info);
+	Protocol::PosInfo* GetPlayerInfo() { return PosInfo; }
 
 public:	
 	// Called every frame
@@ -42,6 +44,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	class Protocol::PlayerInfo* PlayerInfo; // 현재 위치
-	class Protocol::PlayerInfo* DestInfo; // 목적지
+	bool IsMine;
+	class Protocol::PosInfo* PosInfo; // 현재 위치
+	class Protocol::PosInfo* DestInfo; // 목적지
+	class Protocol::ObjectInfo* ObjectInfo; //플레이어 정보
 };

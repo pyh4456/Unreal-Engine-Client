@@ -10,16 +10,19 @@ AS1Player::AS1Player()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	PlayerInfo = new Protocol::PlayerInfo();
-	DestInfo = new Protocol::PlayerInfo();
+	PosInfo = new Protocol::PosInfo();
+	DestInfo = new Protocol::PosInfo();
+	ObjectInfo = new Protocol::ObjectInfo();
 }
 
 AS1Player::~AS1Player()
 {
-	delete PlayerInfo;
+	delete PosInfo;
 	delete DestInfo;
-	PlayerInfo = nullptr;
+	delete ObjectInfo;
+	PosInfo = nullptr;
 	DestInfo = nullptr;
+	ObjectInfo = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -36,35 +39,40 @@ void AS1Player::BeginPlay()
 	}
 }
 
-bool AS1Player::IsMyPlayer()
-{
-	return Cast<AS1MyPlayer>(this) != nullptr;
-}
-
 void AS1Player::SetMoveState(Protocol::MoveState State)
 {
-	PlayerInfo->set_state(State);
+	PosInfo->set_state(State);
 }
 
-void AS1Player::SetPlayerInfo(const Protocol::PlayerInfo& Info)
+void AS1Player::SetPlayerInfo(const Protocol::ObjectInfo& Info)
 {
-	if (PlayerInfo->object_id() != 0)
+	if (ObjectInfo->object_id() != 0)
 	{
-		assert(PlayerInfo->object_id() == Info.object_id());
+		assert(ObjectInfo->object_id() == Info.object_id());
 	}
 
-	PlayerInfo->CopyFrom(Info);
+	ObjectInfo->CopyFrom(Info);
+}
+
+void AS1Player::SetPosInfo(const Protocol::PosInfo& Info)
+{
+	if (PosInfo->object_id() != 0)
+	{
+		assert(PosInfo->object_id() == Info.object_id());
+	}
+
+	PosInfo->CopyFrom(Info);
 
 	FVector Location(Info.x(), Info.y(), Info.z());
 	FQuat Rotation(0, 0, 0, 0);
 	SetActorLocationAndRotation(Location, Rotation);
 }
 
-void AS1Player::SetDestInfo(const Protocol::PlayerInfo& Info)
+void AS1Player::SetDestInfo(const Protocol::PosInfo& Info)
 {
-	if (PlayerInfo->object_id() != 0)
+	if (PosInfo->object_id() != 0)
 	{
-		assert(PlayerInfo->object_id() == Info.object_id());
+		assert(PosInfo->object_id() == Info.object_id());
 	}
 
 	// Dest에 최종 상태 복사.
@@ -73,7 +81,7 @@ void AS1Player::SetDestInfo(const Protocol::PlayerInfo& Info)
 
 int AS1Player::GetCharacterType()
 {
-	switch (PlayerInfo->type())
+	switch (ObjectInfo->player_type())
 	{
 	case Protocol::PLAYER_TYPE_YOSHIKA:
 		return 1;
@@ -96,10 +104,10 @@ void AS1Player::Tick(float DeltaTime)
 
 	{
 		FVector Location = GetActorLocation();
-		PlayerInfo->set_x(Location.X);
-		PlayerInfo->set_y(Location.Y);
-		PlayerInfo->set_z(Location.Z);
-		PlayerInfo->set_yaw(GetControlRotation().Yaw);
+		PosInfo->set_x(Location.X);
+		PosInfo->set_y(Location.Y);
+		PosInfo->set_z(Location.Z);
+		PosInfo->set_yaw(GetControlRotation().Yaw);
 	}
 
 	if (IsMyPlayer() == false)
