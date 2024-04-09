@@ -36,6 +36,26 @@ void AS1Player::BeginPlay()
 		DestInfo->set_y(Location.Y);
 		DestInfo->set_z(Location.Z);
 		DestInfo->set_yaw(GetControlRotation().Yaw);
+		DestInfo->set_pitch(GetControlRotation().Pitch);
+	}
+}
+
+void AS1Player::SetMoveState(int State)
+{
+	switch (State)
+	{
+	case 1:
+		PosInfo->set_state(Protocol::MOVE_STATE_IDLE);
+		break;
+	case 2:
+		PosInfo->set_state(Protocol::MOVE_STATE_RUN);
+		break;
+	case 3:
+		PosInfo->set_state(Protocol::MOVE_STATE_AIM);
+		break;
+	default:
+		PosInfo->set_state(Protocol::MOVE_STATE_NONE);
+		break;
 	}
 }
 
@@ -108,6 +128,7 @@ void AS1Player::Tick(float DeltaTime)
 		PosInfo->set_y(Location.Y);
 		PosInfo->set_z(Location.Z);
 		PosInfo->set_yaw(GetControlRotation().Yaw);
+		PosInfo->set_pitch(GetControlRotation().Pitch);
 	}
 
 	if (IsMyPlayer() == false)
@@ -124,7 +145,9 @@ void AS1Player::Tick(float DeltaTime)
 		MoveDist = FMath::Min(MoveDist, DistToDest);
 		FVector NextLocation = Location + MoveDir * MoveDist;
 		SetActorLocation(NextLocation);
+
 		SetActorRotation(FRotator(0, DestInfo->yaw(), 0));
+		
 	}
 }
 

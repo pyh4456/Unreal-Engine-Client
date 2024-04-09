@@ -158,60 +158,6 @@ void US1GameInstance::HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool I
 
 		Players.Add(ObjectInfo.object_id(), Player);
 	}
-
-	
-	//if (IsMine)
-	//{
-	//	auto* Character = UGameplayStatics::GetPlayerCharacter(World, 0);
-
-	//	MyPlayer = Character;
-	//	//Players.Add(PlayerInfo.object_id(), MyPlayer);
-	//}
-	//else
-	//{
-	//	UObject* SpawnActor = BP_Character;
-	//	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	//	if (!SpawnActor)
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-	//		return;
-	//	}
-
-	//	AActor* Player = World->SpawnActor(GeneratedBP->GeneratedClass, &SpawnLocation);
-
-	//	Players.Add(PlayerInfo.object_id(), Player);
-	//}
-	/*UObject* SpawnActor = BP_Character;
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	if (!SpawnActor)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-		return;
-	}*/
-
-	/*UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == NULL)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return;
-	}*/
-
-	/*if (IsMine)
-	{
-		auto* PC = UGameplayStatics::GetPlayerController(this, 0);
-		SpawnActor = BP_Character(PC->GetPawn());
-		if (SpawnActor == nullptr)
-			return;
-
-		MyPlayer = Cast<AActor>(SpawnActor);
-		Players.Add(PlayerInfo.object_id(), MyPlayer);
-	}
-	else
-	{
-		AActor* Player = World->SpawnActor(GeneratedBP->GeneratedClass, &SpawnLocation);
-
-		Players.Add(PlayerInfo.object_id(), Player);
-	}*/
 }
 
 void US1GameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
@@ -221,7 +167,7 @@ void US1GameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 
 void US1GameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 {
-	for (auto& Player : SpawnPkt.players())
+	for (auto& Player : SpawnPkt.objects())
 	{
 		HandleSpawn(Player, false);
 	}

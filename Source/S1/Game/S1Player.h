@@ -28,12 +28,20 @@ protected:
 public:
 	bool IsMyPlayer() { return IsMine; }
 	void SetIsMyPlayer(bool isMyPlayer) { IsMine = isMyPlayer; }
-	Protocol::MoveState GetMoveState() { return PosInfo->state(); }
+
+	UFUNCTION(BlueprintCallable)
+	void SetMoveState(int State);
 	void SetMoveState(Protocol::MoveState State);
 
 	void SetPlayerInfo(const Protocol::ObjectInfo& Info);
 	void SetPosInfo(const Protocol::PosInfo& Info);
 	void SetDestInfo(const Protocol::PosInfo& Info);
+
+	UFUNCTION(BlueprintCallable)
+	int GetMoveState() { return DestInfo->state(); }
+	UFUNCTION(BlueprintCallable)
+	float GetPitch() { return DestInfo->pitch(); }
+
 	Protocol::PosInfo* GetPlayerInfo() { return PosInfo; }
 
 public:	
