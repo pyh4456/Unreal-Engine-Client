@@ -19,7 +19,7 @@ class S1_API US1GameInstance : public UGameInstance
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void ConnectToGameServer();
+	bool ConnectToGameServer(FString id, FString password);
 
 	UFUNCTION(BlueprintCallable)
 	void DisconnectFromGameServer();
@@ -28,6 +28,24 @@ public:
 	void HandleRecvPackets();
 
 	void SendPacket(SendBufferRef SendBuffer);
+
+	UFUNCTION(BlueprintCallable)
+	void SelectCharacter(int character);
+
+	UFUNCTION(BlueprintCallable)
+	FString GetName(int index) { return CharacterName[index]; }
+	UFUNCTION(BlueprintCallable)
+	int GetScore(int index) { return CharacterScore[index]; };
+	UFUNCTION(BlueprintCallable)
+	int GetCharacterType(int index) { return CharacterType[index]; };
+	UFUNCTION(BlueprintCallable)
+	int GetSelectedCharacter() { return SelectedCharacter; }
+	UFUNCTION(BlueprintCallable)
+	void SetSelectedCharacter(int index) { SelectedCharacter = index; }
+
+	void SetName(int index, FString name) { CharacterName[index] = name; }
+	void SetScore(int index, int score) { CharacterScore[index] = score; }
+	void SetCharacterType(int index, int type) { CharacterType[index] = type; }
 
 public:
 	void HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool IsMine);
@@ -38,7 +56,7 @@ public:
 	void HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt);
 
 	void HandleMove(const Protocol::S_MOVE& MovePkt);
-
+	
 
 public:
 	// GameServer
@@ -70,5 +88,8 @@ public:
 	AS1Player* MyPlayer;
 	TMap<uint64, AS1Player*> Players;
 
-	
+	FString CharacterName[5];
+	uint64 CharacterScore[5];
+	uint64 CharacterType[5];
+	uint64 SelectedCharacter;
 };

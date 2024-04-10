@@ -10,7 +10,7 @@
 #include "ClientPacketHandler.h"
 #include "S1MyPlayer.h"
 
-void US1GameInstance::ConnectToGameServer()
+bool US1GameInstance::ConnectToGameServer(FString id, FString password)
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(TEXT("Stream"), TEXT("Client Socket"));
 
@@ -33,17 +33,23 @@ void US1GameInstance::ConnectToGameServer()
 		GameServerSession = MakeShared<PacketSession>(Socket);
 		GameServerSession->Run();
 
-		// TEMP : 로비에서 캐릭터 선택창 띄움
-		{
-			Protocol::C_LOGIN Pkt;
-			SendBufferRef SendBuffer = ClientPacketHandler::MakeSendBuffer(Pkt);
-			SendPacket(SendBuffer);
-		}
+		Protocol::C_LOGIN Pkt;
+
+		Pkt.set_id(std::string(TCHAR_TO_UTF8(*id)));
+		Pkt.set_password(std::string(TCHAR_TO_UTF8(*password)));
+
+		SendBufferRef SendBuffer = ClientPacketHandler::MakeSendBuffer(Pkt);
+		SendPacket(SendBuffer);
+
+		return true;
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Failed")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Failed")));
+		return false;
 	}
+
+	return false;
 }
 
 void US1GameInstance::DisconnectFromGameServer()
@@ -77,6 +83,30 @@ void US1GameInstance::SendPacket(SendBufferRef SendBuffer)
 		return;
 
 	GameServerSession->SendPacket(SendBuffer);
+}
+
+void US1GameInstance::SelectCharacter(int index)
+{
+	// 로비에서 캐릭터 선택해서 인덱스 전송.
+
+	Protocol::C_ENTER_GAME EnterGamePkt;
+
+	switch (CharacterType[index])
+	{
+	case 1:
+		EnterGamePkt.mutable_selectedcharacter()->set_player_type(Protocol::PLAYER_TYPE_YOSHIKA);
+		break;
+	case 2:
+		EnterGamePkt.mutable_selectedcharacter()->set_player_type(Protocol::PLAYER_TYPE_LYNETTE);
+		break;
+	case 3:
+		EnterGamePkt.mutable_selectedcharacter()->set_player_type(Protocol::PLAYER_TYPE_SANYA);
+		break;
+	}
+	EnterGamePkt.mutable_selectedcharacter()->mutable_player_info()->set_name(std::string(TCHAR_TO_UTF8(*CharacterName[index])));
+	EnterGamePkt.mutable_selectedcharacter()->mutable_player_info()->set_score(CharacterScore[index]);
+
+	SEND_PACKET(EnterGamePkt);
 }
 
 void US1GameInstance::HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool IsMine)
