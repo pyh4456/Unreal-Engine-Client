@@ -55,11 +55,22 @@ public:
 	void SpawnEnemy(const Protocol::ObjectInfo& ObjectInfo);
 	void SpawnBullet(const Protocol::ObjectInfo& ObjectInfo);
 
-	void HandleDespawn(uint64 ObjectId);
+	void HandleDespawn(const Protocol::ObjectInfo& ObjectInfo);
 	void HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt);
 
+	void DespawnPlayer(int64 ObjectId);
+	void DespawnEnemy(int64 ObjectId);
+
+
 	void HandleMove(const Protocol::S_MOVE& MovePkt);
+
+	void HandleScore(const Protocol::S_SCORE& ScorePkt);
 	
+	//UPROPERTY(BlueprintCallable)
+	//int64 RequestFire(FTransform transform);
+
+	UFUNCTION(BlueprintCallable)
+	void RequestScore(int monsterId);
 
 public:
 	// GameServer

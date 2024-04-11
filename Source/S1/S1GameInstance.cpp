@@ -157,6 +157,7 @@ void US1GameInstance::SpawnPlayer(const Protocol::ObjectInfo& ObjectInfo, bool I
 		Player->SetPlayerInfo(ObjectInfo);
 		Player->SetPosInfo(ObjectInfo.pos_info());
 		Player->SetIsMyPlayer(true);
+		Player->SetScore(ObjectInfo.player_info().score());
 
 		MyPlayer = Player;
 		Players.Add(ObjectInfo.object_id(), Player);
@@ -187,6 +188,7 @@ void US1GameInstance::SpawnPlayer(const Protocol::ObjectInfo& ObjectInfo, bool I
 		Player->SetPlayerInfo(ObjectInfo);
 		Player->SetPosInfo(ObjectInfo.pos_info());
 		Player->SetIsMyPlayer(false);
+		Player->SetPlayerNameTag();
 
 		Players.Add(ObjectInfo.object_id(), Player);
 	}
@@ -214,7 +216,6 @@ void US1GameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 			SpawnBullet(Object);
 			break;
 		}
-		
 	}
 }
 
@@ -289,7 +290,26 @@ void US1GameInstance::SpawnBullet(const Protocol::ObjectInfo& ObjectInfo)
 	Bullets.Add(ObjectInfo.object_id(), Bullet);
 }
 
-void US1GameInstance::HandleDespawn(uint64 ObjectId)
+void US1GameInstance::HandleDespawn(const Protocol::ObjectInfo& ObjectInfo)
+{
+	switch (ObjectInfo.object_type())
+	{
+	case Protocol::OBJECT_TYPE_PLAYER:
+		DespawnPlayer(ObjectInfo.object_id());
+		break;
+	case Protocol::OBJECT_TYPE_ENEMY:
+		DespawnEnemy(ObjectInfo.object_id());
+		break;
+	}
+}
+
+void US1GameInstance::HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt)
+{
+	for (auto& Object : DespawnPkt.objects())
+		HandleDespawn(Object);
+}
+
+void US1GameInstance::DespawnPlayer(int64 ObjectId)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -305,10 +325,20 @@ void US1GameInstance::HandleDespawn(uint64 ObjectId)
 	World->DestroyActor(*FindActor);
 }
 
-void US1GameInstance::HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt)
+void US1GameInstance::DespawnEnemy(int64 ObjectId)
 {
-	for (auto& ObjectId : DespawnPkt.object_ids())
-		HandleDespawn(ObjectId);
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	AS1Enemy** FindActor = Enemys.Find(ObjectId);
+	if (FindActor == nullptr)
+		return;
+
+	World->DestroyActor(*FindActor);
 }
 
 void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
@@ -333,4 +363,41 @@ void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 	//Player->SetPlayerInfo(Info); //바로 이동
 
 	Player->SetDestInfo(Info); //이동 목적지를 설정
+}
+
+void US1GameInstance::HandleScore(const Protocol::S_SCORE& ScorePkt)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	if (MyPlayer == nullptr)
+		return;
+
+	MyPlayer->IncreaseScore(ScorePkt.point());
+}
+
+//int64 US1GameInstance::RequestFire(FTransform transform)
+//{
+//	FVector Location = transform.GetLocation();
+//	FQuat Rotation = transform.GetRotation();
+//
+//	Protocol::C_SHOOT pkt;
+//
+//	//pkt.mutable_object()->set_projectile_type(MyPlayer->ObjectInfo->player_type());
+//	pkt.mutable_object()->mutable_pos_info()->set_x(Location.X);
+//
+//	SEND_PACKET(pkt);
+//
+//	return 1;
+//}
+
+
+void US1GameInstance::RequestScore(int monsterId)
+{
+	Protocol::C_SCORE pkt;
+
+	pkt.set_player_id(MyPlayer->GetPlayerInfo()->object_id());
+	pkt.set_monster_id(monsterId);
+
+	SEND_PACKET(pkt);
 }

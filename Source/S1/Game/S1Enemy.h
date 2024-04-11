@@ -24,6 +24,9 @@ protected:
 public:
 	void SetEnemyInfo(const Protocol::ObjectInfo& Info);
 
+	UFUNCTION(BlueprintCallable)
+	int GetObjectId() { return ObjectInfo->object_id(); }
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
