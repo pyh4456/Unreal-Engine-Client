@@ -8,7 +8,8 @@
 #include "S1GameInstance.generated.h"
 
 class AS1Player;
-
+class AS1Enemy;
+class AS1Bullet;
 /**
  * 
  */
@@ -48,9 +49,11 @@ public:
 	void SetCharacterType(int index, int type) { CharacterType[index] = type; }
 
 public:
-	void HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool IsMine);
 	void HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt);
 	void HandleSpawn(const Protocol::S_SPAWN& SpawnPkt);
+	void SpawnPlayer(const Protocol::ObjectInfo& ObjectInfo, bool IsMine);
+	void SpawnEnemy(const Protocol::ObjectInfo& ObjectInfo);
+	void SpawnBullet(const Protocol::ObjectInfo& ObjectInfo);
 
 	void HandleDespawn(uint64 ObjectId);
 	void HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt);
@@ -85,8 +88,27 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AS1Player>  MyPlayerSanya;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Enemy> EnemyClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Bullet> OtherBulletYoshika;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Bullet> OtherBulletLynette;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Bullet> OtherBulletSanya;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Bullet> MyBulletYoshika;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Bullet> MyBulletLynette;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AS1Bullet> MyBulletSanya;
+
 	AS1Player* MyPlayer;
 	TMap<uint64, AS1Player*> Players;
+	TMap<uint64, AS1Enemy*> Enemys;
+	TMap<uint64, AS1Bullet*> Bullets;
 
 	FString CharacterName[5];
 	uint64 CharacterScore[5];

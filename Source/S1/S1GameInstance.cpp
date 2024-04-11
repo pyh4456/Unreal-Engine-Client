@@ -9,6 +9,8 @@
 #include "PacketSession.h"
 #include "ClientPacketHandler.h"
 #include "S1MyPlayer.h"
+#include "S1Enemy.h"
+#include "S1MyBullet.h"
 
 bool US1GameInstance::ConnectToGameServer(FString id, FString password)
 {
@@ -109,7 +111,7 @@ void US1GameInstance::SelectCharacter(int index)
 	SEND_PACKET(EnterGamePkt);
 }
 
-void US1GameInstance::HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool IsMine)
+void US1GameInstance::SpawnPlayer(const Protocol::ObjectInfo& ObjectInfo, bool IsMine)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -192,15 +194,99 @@ void US1GameInstance::HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool I
 
 void US1GameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 {
-	HandleSpawn(EnterGamePkt.player(), true);
+	SpawnPlayer(EnterGamePkt.player(), true);
 }
 
 void US1GameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 {
-	for (auto& Player : SpawnPkt.objects())
+	
+	for (auto& Object : SpawnPkt.objects())
 	{
-		HandleSpawn(Player, false);
+		switch (Object.object_type())
+		{
+		case Protocol::OBJECT_TYPE_PLAYER:
+			SpawnPlayer(Object, false);
+			break;
+		case Protocol::OBJECT_TYPE_ENEMY:
+			SpawnEnemy(Object);
+			break;
+		case Protocol::OBJECT_TYPE_PROJECTILE:
+			SpawnBullet(Object);
+			break;
+		}
+		
 	}
+}
+
+void US1GameInstance::SpawnEnemy(const Protocol::ObjectInfo& ObjectInfo)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	//중복 체크
+	const uint64 ObjectId = ObjectInfo.object_id();
+	if (Players.Find(ObjectId) != nullptr)
+		return;
+
+	FVector SpawnLocation(ObjectInfo.pos_info().x(), ObjectInfo.pos_info().y(), ObjectInfo.pos_info().z());
+
+	// TODO : 적 스폰
+	AS1Enemy* Enemy = nullptr;
+
+	Enemy = Cast<AS1Enemy>(World->SpawnActor(EnemyClass, &SpawnLocation));
+
+	if (Enemy == nullptr)
+		return;
+
+	Enemy->SetEnemyInfo(ObjectInfo);
+
+	Enemys.Add(ObjectInfo.object_id(), Enemy);
+}
+
+void US1GameInstance::SpawnBullet(const Protocol::ObjectInfo& ObjectInfo)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	//중복 체크
+	const uint64 ObjectId = ObjectInfo.object_id();
+	if (Players.Find(ObjectId) != nullptr)
+		return;
+
+	FVector SpawnLocation(ObjectInfo.pos_info().x(), ObjectInfo.pos_info().y(), ObjectInfo.pos_info().z());
+
+	//TODO : 총알 스폰, 총알 속도 설정
+	AS1Bullet* Bullet = nullptr;
+
+	switch (ObjectInfo.player_type())
+	{
+	case Protocol::PLAYER_TYPE_YOSHIKA:
+		Bullet = Cast<AS1Bullet>(World->SpawnActor(OtherBulletYoshika, &SpawnLocation));
+		break;
+	case Protocol::PLAYER_TYPE_LYNETTE:
+		Bullet = Cast<AS1Bullet>(World->SpawnActor(OtherBulletLynette, &SpawnLocation));
+		break;
+	case Protocol::PLAYER_TYPE_SANYA:
+		Bullet = Cast<AS1Bullet>(World->SpawnActor(OtherBulletSanya, &SpawnLocation));
+		break;
+	}
+
+	Bullet = Cast<AS1Bullet>(World->SpawnActor(EnemyClass, &SpawnLocation));
+
+	if (Bullet == nullptr)
+		return;
+
+	Bullet->SetBulletInfo(ObjectInfo);
+
+	Bullets.Add(ObjectInfo.object_id(), Bullet);
 }
 
 void US1GameInstance::HandleDespawn(uint64 ObjectId)
