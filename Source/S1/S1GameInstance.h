@@ -75,7 +75,8 @@ public:
 public:
 	// GameServer
 	class FSocket* Socket;
-	FString IpAddress = TEXT("127.0.0.1");
+	//FString IpAddress = TEXT("222.233.34.249");
+	FString IpAddress = TEXT("192.168.35.92");
 	int16 Port = 7777;
 	TSharedPtr<class PacketSession> GameServerSession;
 
