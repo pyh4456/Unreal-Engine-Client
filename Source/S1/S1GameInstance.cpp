@@ -69,6 +69,10 @@ void US1GameInstance::DisconnectFromGameServer()
 
 	Protocol::C_LEAVE_GAME LeavePkt;
 	SEND_PACKET(LeavePkt);
+
+	Players.Empty();
+	Enemys.Empty();
+	Bullets.Empty();
 }
 
 void US1GameInstance::HandleRecvPackets()
