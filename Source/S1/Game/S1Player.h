@@ -37,6 +37,8 @@ public:
 	void SetPosInfo(const Protocol::PosInfo& Info);
 	void SetDestInfo(const Protocol::PosInfo& Info);
 	void SetScore(const int input) { score = input; }
+	UFUNCTION(BlueprintCallable)
+	void SetMapNumber(int number) { mapNum = number; }
 
 	void IncreaseScore(const int input) { score += input; }
 
@@ -46,10 +48,13 @@ public:
 	float GetPitch() { return DestInfo->pitch(); }
 	UFUNCTION(BlueprintCallable)
 	int GetScore() { return score; }
-
 	UFUNCTION(BlueprintCallable)
 	FString GetName() { return UTF8_TO_TCHAR(ObjectInfo->player_info().name().c_str()); }
+	UFUNCTION(BlueprintCallable)
+	int GetMapNumber() { return mapNum; }
 
+
+	int GetObjectId() { return ObjectInfo->object_id(); }
 
 	Protocol::PosInfo* GetPlayerInfo() { return PosInfo; }
 
@@ -67,6 +72,7 @@ public:
 protected:
 	bool IsMine;
 	int score = 0;
+	int mapNum = 0;
 	class Protocol::PosInfo* PosInfo; // 현재 위치
 	class Protocol::PosInfo* DestInfo; // 목적지
 	class Protocol::ObjectInfo* ObjectInfo; //플레이어 정보

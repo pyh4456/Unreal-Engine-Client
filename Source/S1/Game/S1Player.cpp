@@ -13,6 +13,8 @@ AS1Player::AS1Player()
 	PosInfo = new Protocol::PosInfo();
 	DestInfo = new Protocol::PosInfo();
 	ObjectInfo = new Protocol::ObjectInfo();
+
+	mapNum = 0;
 }
 
 AS1Player::~AS1Player()
