@@ -10,6 +10,7 @@ AS1Enemy::AS1Enemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ObjectInfo = new Protocol::ObjectInfo();
+	MoveState = false;
 }
 
 AS1Enemy::~AS1Enemy()
@@ -33,6 +34,18 @@ void AS1Enemy::SetEnemyInfo(const Protocol::ObjectInfo& Info)
 	}
 
 	ObjectInfo->CopyFrom(Info);
+}
+
+void AS1Enemy::SetTargetLocation(float x, float y, float z)
+{
+	TargetLocation.X = x;
+	TargetLocation.Y = y;
+	TargetLocation.Z = z;
+}
+
+void AS1Enemy::SetMoveState(bool state)
+{
+	MoveState = state;
 }
 
 // Called every frame

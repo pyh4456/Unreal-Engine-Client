@@ -66,12 +66,12 @@ void US1GameInstance::DisconnectFromGameServer()
 	Enemys.Empty();
 	Bullets.Empty();
 
-	if (Socket)
-	{
-		ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
-		SocketSubsystem->DestroySocket(Socket);
-		Socket = nullptr;
-	}
+	//if (Socket)
+	//{
+	//	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
+	//	SocketSubsystem->DestroySocket(Socket);
+	//	Socket = nullptr;
+	//}
 }
 
 void US1GameInstance::HandleRecvPackets()
@@ -236,6 +236,11 @@ void US1GameInstance::MoveMap(int mapNumber)
 	MyPlayer->SetMapNumber(mapNumber);
 }
 
+AS1Enemy* US1GameInstance::GetEnemyFromId(int object_id)
+{
+	return Enemys[object_id];
+}
+
 void US1GameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 {
 	SpawnPlayer(EnterGamePkt.player(), true);
@@ -299,37 +304,6 @@ void US1GameInstance::SpawnBullet(const Protocol::ObjectInfo& ObjectInfo)
 	//if (World == nullptr)
 	//	return;
 
-	////중복 체크
-	//const uint64 ObjectId = ObjectInfo.object_id();
-	//if (Players.Find(ObjectId) != nullptr)
-	//	return;
-
-	//FVector SpawnLocation(ObjectInfo.pos_info().x(), ObjectInfo.pos_info().y(), ObjectInfo.pos_info().z());
-
-	////TODO : 총알 스폰, 총알 속도 설정
-	//AS1Bullet* Bullet = nullptr;
-
-	//switch (ObjectInfo.player_type())
-	//{
-	//case Protocol::PLAYER_TYPE_YOSHIKA:
-	//	Bullet = Cast<AS1Bullet>(World->SpawnActor(OtherBulletYoshika, &SpawnLocation));
-	//	break;
-	//case Protocol::PLAYER_TYPE_LYNETTE:
-	//	Bullet = Cast<AS1Bullet>(World->SpawnActor(OtherBulletLynette, &SpawnLocation));
-	//	break;
-	//case Protocol::PLAYER_TYPE_SANYA:
-	//	Bullet = Cast<AS1Bullet>(World->SpawnActor(OtherBulletSanya, &SpawnLocation));
-	//	break;
-	//}
-
-	//Bullet = Cast<AS1Bullet>(World->SpawnActor(EnemyClass, &SpawnLocation));
-
-	//if (Bullet == nullptr)
-	//	return;
-
-	//Bullet->SetBulletInfo(ObjectInfo);
-
-	//Bullets.Add(ObjectInfo.object_id(), Bullet);
 }
 
 void US1GameInstance::HandleDespawn(const Protocol::ObjectInfo& ObjectInfo)
@@ -385,6 +359,24 @@ void US1GameInstance::DespawnEnemy(int64 ObjectId)
 	World->DestroyActor(*FindActor);
 }
 
+void US1GameInstance::HandleEnemyAi(const Protocol::S_AI_TARGET& pkt)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	const uint64 ObjectId = pkt.object_id();
+
+	AS1Enemy* enemy = Enemys[ObjectId];
+
+	enemy->SetTargetLocation(pkt.target_location().x(),
+		pkt.target_location().y(), pkt.target_location().z());
+	enemy->SetMoveState(true);
+}
+
 void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
@@ -419,22 +411,6 @@ void US1GameInstance::HandleScore(const Protocol::S_SCORE& ScorePkt)
 
 	MyPlayer->IncreaseScore(ScorePkt.point());
 }
-
-//int64 US1GameInstance::RequestFire(FTransform transform)
-//{
-//	FVector Location = transform.GetLocation();
-//	FQuat Rotation = transform.GetRotation();
-//
-//	Protocol::C_SHOOT pkt;
-//
-//	//pkt.mutable_object()->set_projectile_type(MyPlayer->ObjectInfo->player_type());
-//	pkt.mutable_object()->mutable_pos_info()->set_x(Location.X);
-//
-//	SEND_PACKET(pkt);
-//
-//	return 1;
-//}
-
 
 void US1GameInstance::RequestScore(int monsterId)
 {

@@ -45,6 +45,8 @@ public:
 	void SetSelectedCharacter(int index) { SelectedCharacter = index; }
 	UFUNCTION(BlueprintCallable)
 	void MoveMap(int mapNumber);
+	UFUNCTION(BlueprintCallable)
+	AS1Enemy* GetEnemyFromId(int object_id);
 
 	void SetName(int index, FString name) { CharacterName[index] = name; }
 	void SetScore(int index, int score) { CharacterScore[index] = score; }
@@ -63,6 +65,7 @@ public:
 	void DespawnPlayer(int64 ObjectId);
 	void DespawnEnemy(int64 ObjectId);
 
+	void HandleEnemyAi(const Protocol::S_AI_TARGET& pkt);
 
 	void HandleMove(const Protocol::S_MOVE& MovePkt);
 

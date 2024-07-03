@@ -8,7 +8,7 @@
 #include "S1Enemy.generated.h"
 
 UCLASS()
-class S1_API AS1Enemy : public AActor
+class S1_API AS1Enemy : public APawn
 {
 	GENERATED_BODY()
 	
@@ -23,7 +23,14 @@ protected:
 
 public:
 	void SetEnemyInfo(const Protocol::ObjectInfo& Info);
+	void SetTargetLocation(float x, float y, float z);
+	UFUNCTION(BlueprintCallable)
+	void SetMoveState(bool state);
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetTargetLocation() { return TargetLocation; }
+	UFUNCTION(BlueprintCallable) 
+	bool GetMoveState() { return MoveState; }
 	UFUNCTION(BlueprintCallable)
 	int GetObjectId() { return ObjectInfo->object_id(); }
 
@@ -33,4 +40,6 @@ public:
 
 public:
 	class Protocol::ObjectInfo* ObjectInfo; //Àû Á¤º¸
+	FVector TargetLocation;
+	bool MoveState;
 };
