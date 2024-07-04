@@ -370,23 +370,31 @@ void US1GameInstance::HandleEnemyAi(const Protocol::S_AI& pkt)
 
 	const uint64 ObjectId = pkt.object_id();
 
-	AS1Enemy* enemy = Enemys[ObjectId];
+	AS1Enemy** enemy = Enemys.Find(ObjectId);
 
-	enemy->SetTargetLocation(pkt.target_location().x(),
+	if (enemy == nullptr)
+		return;
+
+	(*enemy)->SetTargetLocation(pkt.target_location().x(),
 		pkt.target_location().y(), pkt.target_location().z());
 
 	switch (pkt.state())
 	{
 	case Protocol::AISTATE_NONE:
-		enemy->SetMoveState(AiState::NONE);
+		(*enemy)->SetMoveState(AiState::NONE);
+		break;
 	case Protocol::AISTATE_IDLE:
-		enemy->SetMoveState(AiState::IDLE);
+		(*enemy)->SetMoveState(AiState::IDLE);
+		break;
 	case Protocol::AISTATE_MOVE:
-		enemy->SetMoveState(AiState::MOVE);
+		(*enemy)->SetMoveState(AiState::MOVE);
+		break;
 	case Protocol::AISTATE_ATTACK:
-		enemy->SetMoveState(AiState::ATTACK);
+		(*enemy)->SetMoveState(AiState::ATTACK);
+		break;
 	case Protocol::AISTATE_RUNAWAY:
-		enemy->SetMoveState(AiState::RUNAWAY);
+		(*enemy)->SetMoveState(AiState::RUNAWAY);
+		break;
 	}
 	
 }
