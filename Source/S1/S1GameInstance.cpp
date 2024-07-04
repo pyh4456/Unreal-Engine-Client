@@ -359,7 +359,7 @@ void US1GameInstance::DespawnEnemy(int64 ObjectId)
 	World->DestroyActor(*FindActor);
 }
 
-void US1GameInstance::HandleEnemyAi(const Protocol::S_AI_TARGET& pkt)
+void US1GameInstance::HandleEnemyAi(const Protocol::S_AI& pkt)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -374,7 +374,21 @@ void US1GameInstance::HandleEnemyAi(const Protocol::S_AI_TARGET& pkt)
 
 	enemy->SetTargetLocation(pkt.target_location().x(),
 		pkt.target_location().y(), pkt.target_location().z());
-	enemy->SetMoveState(true);
+
+	switch (pkt.state())
+	{
+	case Protocol::AISTATE_NONE:
+		enemy->SetMoveState(AiState::NONE);
+	case Protocol::AISTATE_IDLE:
+		enemy->SetMoveState(AiState::IDLE);
+	case Protocol::AISTATE_MOVE:
+		enemy->SetMoveState(AiState::MOVE);
+	case Protocol::AISTATE_ATTACK:
+		enemy->SetMoveState(AiState::ATTACK);
+	case Protocol::AISTATE_RUNAWAY:
+		enemy->SetMoveState(AiState::RUNAWAY);
+	}
+	
 }
 
 void US1GameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)

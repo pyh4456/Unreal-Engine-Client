@@ -65,7 +65,7 @@ public:
 	void DespawnPlayer(int64 ObjectId);
 	void DespawnEnemy(int64 ObjectId);
 
-	void HandleEnemyAi(const Protocol::S_AI_TARGET& pkt);
+	void HandleEnemyAi(const Protocol::S_AI& pkt);
 
 	void HandleMove(const Protocol::S_MOVE& MovePkt);
 

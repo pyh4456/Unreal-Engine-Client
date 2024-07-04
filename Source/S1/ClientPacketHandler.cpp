@@ -108,7 +108,7 @@ bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt)
 	return true;
 }
 
-bool Handle_S_AI_TARGET(PacketSessionRef& session, Protocol::S_AI_TARGET& pkt)
+bool Handle_S_AI(PacketSessionRef& session, Protocol::S_AI& pkt)
 {
 	if (auto* GameInstance = Cast<US1GameInstance>(GWorld->GetGameInstance()))
 	{
@@ -118,3 +118,4 @@ bool Handle_S_AI_TARGET(PacketSessionRef& session, Protocol::S_AI_TARGET& pkt)
 
 	return false;
 }
+

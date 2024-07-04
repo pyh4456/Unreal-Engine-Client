@@ -10,7 +10,7 @@ AS1Enemy::AS1Enemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ObjectInfo = new Protocol::ObjectInfo();
-	MoveState = false;
+	MoveState = AiState::NONE;
 }
 
 AS1Enemy::~AS1Enemy()
@@ -43,7 +43,7 @@ void AS1Enemy::SetTargetLocation(float x, float y, float z)
 	TargetLocation.Z = z;
 }
 
-void AS1Enemy::SetMoveState(bool state)
+void AS1Enemy::SetMoveState(AiState state)
 {
 	MoveState = state;
 }

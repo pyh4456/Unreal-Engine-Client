@@ -7,6 +7,16 @@
 #include "Protocol.pb.h"
 #include "S1Enemy.generated.h"
 
+UENUM(BlueprintType)
+enum class AiState : uint8
+{
+	NONE UMETA(DisplayName = "NONE"),
+	IDLE UMETA(DisplayName = "IDLE"),
+	MOVE UMETA(DisplayName = "MOVE"),
+	ATTACK UMETA(DisplayName = "ATTACK"),
+	RUNAWAY UMETA(DisplayName = "RUNAWAY")
+};
+
 UCLASS()
 class S1_API AS1Enemy : public APawn
 {
@@ -25,12 +35,12 @@ public:
 	void SetEnemyInfo(const Protocol::ObjectInfo& Info);
 	void SetTargetLocation(float x, float y, float z);
 	UFUNCTION(BlueprintCallable)
-	void SetMoveState(bool state);
+	void SetMoveState(AiState state);
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetTargetLocation() { return TargetLocation; }
 	UFUNCTION(BlueprintCallable) 
-	bool GetMoveState() { return MoveState; }
+	AiState GetState() { return MoveState; }
 	UFUNCTION(BlueprintCallable)
 	int GetObjectId() { return ObjectInfo->object_id(); }
 
@@ -41,5 +51,5 @@ public:
 public:
 	class Protocol::ObjectInfo* ObjectInfo; //Àû Á¤º¸
 	FVector TargetLocation;
-	bool MoveState;
+	AiState MoveState;
 };
